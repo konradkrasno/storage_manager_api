@@ -54,4 +54,7 @@ class NotePositionAdmin(admin.ModelAdmin):
         "price_net",
         "tax_rate",
         "discount_value",
+        "value_net",
+        "tax_value",
+        "value_gross",
     ]

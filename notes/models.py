@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from products.models import Product
 from stock.models import Stock
@@ -69,6 +71,7 @@ class Note(models.Model):
         ("order", "Order"),
         ("supply", "Supply"),
         ("dispatch", "Dispatch"),
+        ("return", "Return"),
     )
     HANDOVER_TYPE_CHOICES = (
         ("internal", "Internal"),
@@ -83,47 +86,44 @@ class Note(models.Model):
         Store,
         related_name="dispatch_notes",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
     )
     from_shop = models.ForeignKey(
         Shop,
         related_name="dispatch_notes",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
     )
     from_contractor = models.ForeignKey(
         Contractor,
         related_name="dispatch_notes",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
     )
     to_store = models.ForeignKey(
         Store,
         related_name="supply_notes",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
     )
     to_shop = models.ForeignKey(
         Shop,
         related_name="supply_notes",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
     )
     to_contractor = models.ForeignKey(
         Contractor,
         related_name="supply_notes",
         on_delete=models.PROTECT,
-        blank=True,
         null=True,
     )
     worker = models.ForeignKey(
         Worker, related_name="notes", on_delete=models.PROTECT, blank=True, null=True
     )
+    value_net = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    value_gross = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return f"<Note: {self.number}>"
@@ -140,9 +140,47 @@ class NotePosition(models.Model):
         Product, related_name="note_positions", on_delete=models.PROTECT
     )
     quantity = models.DecimalField(max_digits=10, decimal_places=2)
-    price_net = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    tax_rate = models.PositiveIntegerField(null=True)
-    discount_value = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    price_net = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_rate = models.PositiveIntegerField(default=0)
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    value_net = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_value = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    value_gross = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     def __str__(self):
         return f"<NotePosition: {self.product}>"
+
+    def save(self, *args, **kwargs):
+        if self.price_net:
+            self.calculate_position_values()
+            self.calculate_note_values()
+        super().save(*args, **kwargs)
+
+    def calculate_position_values(self):
+        """
+        Calculates value_net, tax_value and value_gross for NotePosition.
+        """
+
+        discounted_price = Decimal(self.price_net) - Decimal(self.discount_value)
+        self.value_net = discounted_price * Decimal(self.quantity)
+        self.tax_value = self.value_net * Decimal(self.tax_rate) / 100
+        self.value_gross = self.value_net + self.tax_value
+
+    def calculate_note_values(self):
+        """
+        Updates value_net, tax_value and value_gross in related Note.
+        """
+
+        value_net = Decimal(self.note.value_net)
+        value_net += Decimal(self.value_net)
+        self.note.value_net = value_net
+
+        tax_value = Decimal(self.note.tax_value)
+        tax_value += Decimal(self.tax_value)
+        self.note.tax_value = tax_value
+
+        value_gross = Decimal(self.note.value_gross)
+        value_gross += Decimal(self.value_gross)
+        self.note.value_gross = value_gross
+
+        self.note.save()
