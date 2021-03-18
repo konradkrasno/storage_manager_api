@@ -1,3 +1,4 @@
+from accounts.models import User
 from notes.models import Note, NotePosition, Contractor
 from products.models import Product
 from rest_framework import serializers
@@ -6,20 +7,28 @@ from workers.models import Worker
 from .models import Receipt, Invoice, AdvanceInvoice
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+
+
 class WorkerSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Worker
-        fields = ["first_name", "last_name", "position", "active"]
+        fields = ["user", "position"]
 
 
 class ContractorSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
     class Meta:
         model = Contractor
         fields = [
-            "first_name",
-            "last_name",
+            "user",
             "company_name",
-            "email",
             "address",
             "postal_code",
             "city",
