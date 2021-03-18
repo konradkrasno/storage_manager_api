@@ -1,4 +1,5 @@
 from django.db import models
+from accounts.models import User
 
 
 class Worker(models.Model):
@@ -6,10 +7,8 @@ class Worker(models.Model):
     Identifies company employees.
     """
 
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
     position = models.CharField(max_length=20)
-    active = models.BooleanField()
+    user = models.OneToOneField(User, related_name="worker", on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"<Worker: {self.first_name} {self.last_name}>"
+        return f"<Worker: {self.user.first_name} {self.user.last_name}>"

@@ -17,13 +17,11 @@ class ShopAdmin(admin.ModelAdmin):
 class ContractorAdmin(admin.ModelAdmin):
     list_display = [
         "type",
-        "first_name",
-        "last_name",
         "company_name",
-        "email",
         "address",
         "postal_code",
         "city",
+        "user",
     ]
 
 

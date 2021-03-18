@@ -8,7 +8,6 @@ from notes.models import Note
 
 @pytest.mark.django_db
 class TestModels:
-
     @staticmethod
     def test_create_invoice():
         note = Note.objects.get(number="EXT-DIS-1")
@@ -51,7 +50,6 @@ class TestModels:
 
 @pytest.mark.django_db
 class TestViews:
-
     @staticmethod
     def test_receipt_create_view(client):
         assert not Receipt.objects.first()

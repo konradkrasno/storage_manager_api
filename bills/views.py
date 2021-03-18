@@ -6,12 +6,14 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from notes.models import Note
 from rest_framework import generics
+from rest_framework.authentication import BasicAuthentication
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from test_data import test_data
 from workers.models import Worker
 
 from .models import Payment, Receipt, Invoice, AdvanceInvoice
+from .permissions import IsWorker
 from .serializers import ReceiptSerializer, InvoiceSerializer, AdvanceInvoiceSerializer
 
 
@@ -62,6 +64,9 @@ class AdvanceInvoiceDetailView(generics.RetrieveAPIView):
 
 
 class ReceiptCreateView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def post(self, request, note_number):
         note = get_object_or_404(
             Note, number=note_number, type="dispatch", handover_type="external"
@@ -84,6 +89,9 @@ class ReceiptCreateView(APIView):
 
 
 class InvoiceCreateView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def post(self, request, note_number, worker_id, supply_time):
         note = get_object_or_404(
             Note, number=note_number, type="dispatch", handover_type="external"
@@ -111,6 +119,9 @@ class InvoiceCreateView(APIView):
 
 
 class AdvanceInvoiceCreateView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def post(self, request, note_number, worker_id, supply_time, advance_value):
         note = get_object_or_404(
             Note, number=note_number, type="dispatch", handover_type="external"
@@ -141,6 +152,9 @@ class AdvanceInvoiceCreateView(APIView):
 
 
 class InvoiceUpdateView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def put(self, request, note_number, worker_id, supply_time, state):
         worker = get_object_or_404(Worker, id=worker_id)
         invoice = get_object_or_404(Invoice, note__number=note_number)
@@ -152,6 +166,9 @@ class InvoiceUpdateView(APIView):
 
 
 class AdvanceInvoiceUpdateView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def put(self, request, note_number, worker_id, supply_time, state, advance_value):
         worker = get_object_or_404(Worker, id=worker_id)
         invoice = get_object_or_404(AdvanceInvoice, note__number=note_number)
@@ -164,18 +181,27 @@ class AdvanceInvoiceUpdateView(APIView):
 
 
 class ReceiptDeleteView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def delete(self, request, note_number):
         Receipt.objects.filter(note__number=note_number).delete()
         return Response({"deleted": True})
 
 
 class InvoiceDeleteView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def delete(self, request, note_number):
         Invoice.objects.filter(note__number=note_number).delete()
         return Response({"deleted": True})
 
 
 class AdvanceInvoiceDeleteView(APIView):
+    authentication_classes = (BasicAuthentication,)
+    permission_classes = (IsWorker,)
+
     def delete(self, request, note_number):
         AdvanceInvoice.objects.filter(note__number=note_number).delete()
         return Response({"deleted": True})
