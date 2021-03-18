@@ -19,10 +19,13 @@ class AddTestData(APIView):
     def post(self, request):
         """Adds test data to the database."""
 
-        for model, values in test_data.items():
-            for data in values:
-                model(**data).save()
-        return Response({"ok": "Test data uploaded"})
+        if not Note.objects.first():
+            for model, values in test_data.items():
+                for data in values:
+                    model(**data).save()
+            return Response({"ok": "Test data uploaded"})
+        else:
+            return Response({"ok": "Test data uploaded already"})
 
 
 class ReceiptListView(generics.ListAPIView):
