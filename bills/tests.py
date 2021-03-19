@@ -51,9 +51,9 @@ class TestModels:
 @pytest.mark.django_db
 class TestViews:
     @staticmethod
-    def test_receipt_create_view(client):
+    def test_receipt_create_view(worker_1):
         assert not Receipt.objects.first()
-        response = client.post("/bills/receipts/create/EXT-DIS-1/")
+        response = worker_1.post("/bills/receipts/create/EXT-DIS-1/")
         assert response.status_code == 200
         receipt = Receipt.objects.first()
         assert receipt.value_net == Decimal("95.70")
@@ -61,9 +61,9 @@ class TestViews:
         assert receipt.value_gross == Decimal("117.71")
 
     @staticmethod
-    def test_invoice_create_view(client):
+    def test_invoice_create_view(worker_1):
         assert not Invoice.objects.first()
-        response = client.post("/bills/invoices/create/EXT-DIS-1/1/3/")
+        response = worker_1.post("/bills/invoices/create/EXT-DIS-1/3/")
         assert response.status_code == 200
         invoice = Invoice.objects.first()
         assert invoice.worker.id == 1
@@ -75,9 +75,9 @@ class TestViews:
         assert invoice.value_gross == Decimal("117.71")
 
     @staticmethod
-    def test_advance_invoice_create_view(client):
+    def test_advance_invoice_create_view(worker_1):
         assert not AdvanceInvoice.objects.first()
-        response = client.post("/bills/adv_invoices/create/EXT-DIS-1/1/3/50/")
+        response = worker_1.post("/bills/adv_invoices/create/EXT-DIS-1/3/50/")
         assert response.status_code == 200
         invoice = AdvanceInvoice.objects.first()
         assert invoice.worker.id == 1
@@ -92,9 +92,9 @@ class TestViews:
         assert invoice.rest_value_gross == Decimal("67.71")
 
     @staticmethod
-    def test_invoice_update_view(client):
-        client.post("/bills/invoices/create/EXT-DIS-1/1/3/")
-        response = client.put("/bills/invoices/update/EXT-DIS-1/2/5/executed/")
+    def test_invoice_update_view(worker_1, worker_2):
+        worker_1.post("/bills/invoices/create/EXT-DIS-1/3/")
+        response = worker_2.put("/bills/invoices/update/EXT-DIS-1/5/executed/")
         assert response.status_code == 200
         invoice = Invoice.objects.first()
         assert invoice.worker.id == 2
@@ -102,9 +102,9 @@ class TestViews:
         assert invoice.supply_date == date.today() + timedelta(days=5)
 
     @staticmethod
-    def test_advance_invoice_update_view(client):
-        client.post("/bills/adv_invoices/create/EXT-DIS-1/1/3/50/")
-        response = client.put("/bills/adv_invoices/update/EXT-DIS-1/2/5/executed/40/")
+    def test_advance_invoice_update_view(worker_1, worker_2):
+        worker_1.post("/bills/adv_invoices/create/EXT-DIS-1/3/50/")
+        response = worker_2.put("/bills/adv_invoices/update/EXT-DIS-1/5/executed/40/")
         assert response.status_code == 200
         invoice = AdvanceInvoice.objects.first()
         assert invoice.worker.id == 2
@@ -119,27 +119,27 @@ class TestViews:
 
     @staticmethod
     @pytest.mark.django_db
-    def test_receipt_delete_view(client):
-        client.post("/bills/receipts/create/EXT-DIS-1/")
+    def test_receipt_delete_view(worker_1):
+        worker_1.post("/bills/receipts/create/EXT-DIS-1/")
         assert Receipt.objects.first()
-        response = client.delete("/bills/receipts/delete/EXT-DIS-1/")
+        response = worker_1.delete("/bills/receipts/delete/EXT-DIS-1/")
         assert response.status_code == 200
         assert not Receipt.objects.first()
 
     @staticmethod
     @pytest.mark.django_db
-    def test_invoice_delete_view(client):
-        client.post("/bills/invoices/create/EXT-DIS-1/1/3/")
+    def test_invoice_delete_view(worker_1):
+        worker_1.post("/bills/invoices/create/EXT-DIS-1/3/")
         assert Invoice.objects.first()
-        response = client.delete("/bills/invoices/delete/EXT-DIS-1/")
+        response = worker_1.delete("/bills/invoices/delete/EXT-DIS-1/")
         assert response.status_code == 200
         assert not Invoice.objects.first()
 
     @staticmethod
     @pytest.mark.django_db
-    def test_advance_invoice_delete_view(client):
-        client.post("/bills/adv_invoices/create/EXT-DIS-1/1/3/50/")
+    def test_advance_invoice_delete_view(worker_1):
+        worker_1.post("/bills/adv_invoices/create/EXT-DIS-1/3/50/")
         assert AdvanceInvoice.objects.first()
-        response = client.delete("/bills/adv_invoices/delete/EXT-DIS-1/")
+        response = worker_1.delete("/bills/adv_invoices/delete/EXT-DIS-1/")
         assert response.status_code == 200
         assert not AdvanceInvoice.objects.first()

@@ -1,5 +1,6 @@
 from datetime import date
 
+from accounts.models import User
 from notes.models import Store, Shop, Contractor, Note, NotePosition
 from products.models import Manufacturer, Category, Product
 from stock.models import Stock
@@ -10,6 +11,7 @@ test_data = {
     Category: [{"name": "Grocery"}],
     Product: [
         {
+            "id": 1,
             "name": "Black Tea Lipton",
             "group": "B",
             "code": "XYZ123",
@@ -24,6 +26,7 @@ test_data = {
             "category_id": 1,
         },
         {
+            "id": 2,
             "name": "Red Tea Lipton",
             "group": "B",
             "code": "XYZ234",
@@ -38,6 +41,7 @@ test_data = {
             "category_id": 1,
         },
         {
+            "id": 3,
             "name": "Fruit Tea Herbapol",
             "group": "B",
             "code": "XYZ345",
@@ -52,6 +56,7 @@ test_data = {
             "category_id": 1,
         },
         {
+            "id": 4,
             "name": "Earl Grey Tea Tetley",
             "group": "B",
             "code": "XYZ456",
@@ -66,23 +71,60 @@ test_data = {
             "category_id": 1,
         },
     ],
-    Worker: [
+    User: [
         {
+            "id": 1,
             "first_name": "Tom",
             "last_name": "Hagen",
-            "position": "seller",
-            "active": True,
+            "username": "tom_hagen",
+            "is_active": True,
+            "is_staff": True,
+            "email": "tom@hagen.com",
         },
         {
+            "id": 2,
             "first_name": "Luca",
             "last_name": "Brasi",
+            "username": "luca_brasi",
+            "is_active": True,
+            "is_staff": True,
+            "email": "luca@brasi.com",
+        },
+        {
+            "id": 3,
+            "first_name": "Adam",
+            "last_name": "Nowak",
+            "username": "adam_nowak",
+            "is_active": True,
+            "is_staff": False,
+            "email": "adam@nowak.com",
+        },
+        {
+            "id": 4,
+            "first_name": "Jacek",
+            "last_name": "Chmiel",
+            "username": "jck_chmiel",
+            "is_active": True,
+            "is_staff": False,
+            "email": "jck@chmiel.com",
+        },
+    ],
+    Worker: [
+        {
+            "id":1,
+            "position": "seller",
+            "user_id": 1,
+        },
+        {
+            "id": 2,
             "position": "storeman",
-            "active": True,
+            "user_id": 2,
         },
     ],
     Stock: [{}] * 7,
     Store: [
         {
+            "id": 1,
             "name": "Store-Warsaw-01",
             "address": "Sasanki 10",
             "postal_code": "06-852",
@@ -90,6 +132,7 @@ test_data = {
             "stock_id": 1,
         },
         {
+            "id": 2,
             "name": "Store-Warsaw-02",
             "address": "Niezapominajki 15",
             "postal_code": "03-798",
@@ -97,6 +140,7 @@ test_data = {
             "stock_id": 2,
         },
         {
+            "id": 3,
             "name": "Store-Poznan-01",
             "address": "Konwaliowa 15",
             "postal_code": "04-132",
@@ -106,6 +150,7 @@ test_data = {
     ],
     Shop: [
         {
+            "id": 1,
             "name": "Shop-Warsaw-01",
             "address": "Sosnowa 15",
             "postal_code": "04-101",
@@ -113,6 +158,7 @@ test_data = {
             "stock_id": 4,
         },
         {
+            "id": 2,
             "name": "Shop-Warsaw-02",
             "address": "Akacjowa 20",
             "postal_code": "04-115",
@@ -120,6 +166,7 @@ test_data = {
             "stock_id": 5,
         },
         {
+            "id": 3,
             "name": "Shop-Poznan-01",
             "address": "Grabowa 8",
             "postal_code": "04-228",
@@ -127,6 +174,7 @@ test_data = {
             "stock_id": 6,
         },
         {
+            "id": 4,
             "name": "Shop-Poznan-02",
             "address": "Lipowa 8",
             "postal_code": "05-466",
@@ -136,24 +184,22 @@ test_data = {
     ],
     Contractor: [
         {
+            "id": 1,
             "type": "client",
-            "first_name": "Jan",
-            "last_name": "Kowalski",
             "company_name": "",
-            "email": "kowalski@gmail.com",
             "address": "Mysia 8",
             "postal_code": "03-654",
             "city": "Warsaw",
+            "user_id": 3,
         },
         {
+            "id": 2,
             "type": "supplier",
-            "first_name": "Adam",
-            "last_name": "Nowak",
             "company_name": "nowak-invest",
-            "email": "nowak@invest.com",
             "address": "Lisia 20",
             "postal_code": "06-312",
             "city": "Cracow",
+            "user_id": 4,
         },
     ],
     Note: [

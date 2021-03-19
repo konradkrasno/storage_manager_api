@@ -11,22 +11,22 @@ urlpatterns = [
         name="receipt_create",
     ),
     path(
-        "invoices/create/<str:note_number>/<int:worker_id>/<int:supply_time>/",
+        "invoices/create/<str:note_number>/<int:supply_time>/",
         views.InvoiceCreateView.as_view(),
         name="invoice_create",
     ),
     path(
-        "adv_invoices/create/<str:note_number>/<int:worker_id>/<int:supply_time>/<str:advance_value>/",
+        "adv_invoices/create/<str:note_number>/<int:supply_time>/<str:advance_value>/",
         views.AdvanceInvoiceCreateView.as_view(),
         name="adv_invoice_create",
     ),
     path(
-        "invoices/update/<str:note_number>/<int:worker_id>/<int:supply_time>/<str:state>/",
+        "invoices/update/<str:note_number>/<int:supply_time>/<str:state>/",
         views.InvoiceUpdateView.as_view(),
         name="invoice_update",
     ),
     path(
-        "adv_invoices/update/<str:note_number>/<int:worker_id>/<int:supply_time>/<str:state>/<str:advance_value>/",
+        "adv_invoices/update/<str:note_number>/<int:supply_time>/<str:state>/<str:advance_value>/",
         views.AdvanceInvoiceUpdateView.as_view(),
         name="adv_invoice_update",
     ),
